@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -25,8 +26,10 @@ public class Assignment_32 extends Application {
 
 		// Create required panes
 		VBox paneforSelections = new VBox(20); 	// Main control panel
-		HBox paneForInput = new HBox(20); 		// Panel storing inputs
-		HBox paneForButtons = new HBox(20); 	// Panel storing buttons
+		HBox paneForInput = new HBox(15); 		// Panel storing inputs
+		HBox paneForButtons = new HBox(10); 	// Panel storing buttons
+		HBox paneDropDown = new HBox(10);	
+		
 
 		// Creating buttons
 		Button btSearch = new Button("Search");
@@ -34,6 +37,7 @@ public class Assignment_32 extends Application {
 		// Creating labels
 		Label lbSearch = new Label("Search customers:");
 		Label lbWhere = new Label("Where:");
+		Label lbOrderBy = new Label("Order By:");
 
 		// Creating checkboxes for all the fields
 		CheckBox chkName = new CheckBox("Name");
@@ -44,6 +48,11 @@ public class Assignment_32 extends Application {
 
 		// Creating text input
 		TextField tfWhere = new TextField();
+		
+		//Creating drop down menu
+		ComboBox<String> cbOrderBy = new ComboBox<>();
+		cbOrderBy.getItems().addAll("Name", "Address", "City", "State", "Zip");
+		cbOrderBy.setValue("Name");
 
 		// Adding hbox paneForInput to VBox
 		paneforSelections.getChildren().addAll(paneForInput, paneForButtons);
@@ -56,8 +65,13 @@ public class Assignment_32 extends Application {
 		// setting up buttons pane
 		paneForButtons.getChildren().addAll(lbWhere, tfWhere, btSearch);
 		paneForButtons.setAlignment(Pos.CENTER_LEFT);
-		paneForButtons.setPadding(new Insets(5, 1, 5, 1));
-
+		paneForButtons.setPadding(new Insets(5, 1, 5, 15));
+		
+		//Setting up drop down pane
+		paneDropDown.getChildren().addAll(lbOrderBy, cbOrderBy);
+		paneDropDown.setAlignment(Pos.CENTER_LEFT);
+		paneDropDown.setPadding(new Insets(5,1,5,1));
+		
 		// Create a pane for results
 		HBox paneForResults = new HBox(20);
 		paneForResults.getChildren().add(taResults);
@@ -67,13 +81,17 @@ public class Assignment_32 extends Application {
 		BorderPane pane = new BorderPane();
 		pane.setPadding(new Insets(5, 5, 5, 5));
 		pane.setTop(paneForInput);
-		pane.setCenter(paneForButtons);
+		pane.setLeft(paneDropDown);
+		pane.setCenter(paneForButtons);	
 		pane.setBottom(paneForResults);
+		
+		//System.out.println("ORDER BY " + cbOrderBy.getValue());
 
 		// retrieving table data on button click event
 		btSearch.setOnAction(e -> {
 			String columns = "";
 			String whereConditions = "";
+			String orderBy = " ORDER BY " + cbOrderBy.getValue().toString();
 			int counter = 0;
 
 			try {
@@ -138,7 +156,7 @@ public class Assignment_32 extends Application {
 					whereConditions = " WHERE custid > 0";
 				} else
 					whereConditions = " WHERE " + tfWhere.getText();
-
+			
 				// Loading driver for my SQL
 				Class.forName("com.mysql.jdbc.Driver");
 				System.out.println("Driver loaded");
@@ -151,7 +169,7 @@ public class Assignment_32 extends Application {
 				Statement statement = connection.createStatement();
 
 				// Execute a statement
-				ResultSet resultSet = statement.executeQuery("SELECT " + columns + " FROM customers" + whereConditions);
+				ResultSet resultSet = statement.executeQuery("SELECT " + columns + " FROM customers" + whereConditions + orderBy);
 
 				// Clears Text Area so that previous data is not displayed when iteration below executes
 				taResults.clear();
